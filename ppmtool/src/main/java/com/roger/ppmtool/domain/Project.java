@@ -1,6 +1,7 @@
 package com.roger.ppmtool.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -17,7 +18,7 @@ public class Project {
     @NotBlank(message = "Project name is required")
     private String projectName;
 
-    @NotBlank(message = "Project name is required")
+    @NotBlank(message = "Project identifier is required")
     @Size(min=4, max = 5, message = "Please use 4 to 5 characteres")
     @Column(unique = true, updatable = false)
     private String projectIdentifier;
@@ -40,11 +41,11 @@ public class Project {
     public Project() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

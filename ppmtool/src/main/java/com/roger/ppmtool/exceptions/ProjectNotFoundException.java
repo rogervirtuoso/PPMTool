@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class ProjectNotFoundException extends RuntimeException {
 
-    public ProjectNotFoundException(ProjectNotFoundExceptionResponse response) {
-        super(response.getProjectNotFound());
+    public ProjectNotFoundException(String response) {
+        super(response);
     }
 }

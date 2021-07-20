@@ -1,7 +1,6 @@
 package com.roger.ppmtool.services;
 
 import com.roger.ppmtool.domain.Backlog;
-import com.roger.ppmtool.domain.ProjectNotFoundExceptionResponse;
 import com.roger.ppmtool.domain.ProjectTask;
 import com.roger.ppmtool.exceptions.ProjectNotFoundException;
 import com.roger.ppmtool.repositories.BacklogRepository;
@@ -25,7 +24,7 @@ public class ProjectTaskService {
         Backlog backlog = backlogRepository.findByProjectIdentifier(projectIdentifier.toUpperCase());
 
         if (backlog == null) {
-            throw new ProjectNotFoundException(new ProjectNotFoundExceptionResponse(new StringBuilder().append("Project ").append(projectIdentifier).append(" Not found.").toString()));
+            throw new ProjectNotFoundException((new StringBuilder().append("Project ").append(projectIdentifier).append(" Not found.").toString()));
         }
 
         projectTask.setBacklog(backlog);
@@ -53,5 +52,47 @@ public class ProjectTaskService {
 
     public Iterable<ProjectTask> findBacklogById(String id) {
         return projectTaskRepository.findByProjectIdentifierOrderByPriority(id);
+    }
+
+    public ProjectTask findProjectTaskBySequence(String projectId, String backlogId) {
+
+        Backlog backlog = backlogRepository.findByProjectIdentifier(projectId.toUpperCase());
+
+        if (backlog == null) {
+            throw new ProjectNotFoundException((new StringBuilder().append("Project ").append(projectId).append(" Not found.").toString()));
+        }
+
+        ProjectTask projectTask = projectTaskRepository.findByProjectSequence(backlogId);
+        if (projectTask == null) {
+            throw new ProjectNotFoundException(new StringBuilder().append("Project task ").append(backlogId).append(" not found").toString());
+        }
+
+        if (!projectTask.getProjectIdentifier().equals(projectId)) {
+            throw new ProjectNotFoundException(new StringBuilder().append("Project task ").append(backlogId).append(" does not exist in project ").append(projectId).toString());
+        }
+
+        return projectTask;
+    }
+
+    public ProjectTask updateBySequence(ProjectTask updatedTask, String projectId, String backlogId) {
+        ProjectTask projectTask = findProjectTaskBySequence(projectId, backlogId);
+        if (projectTask == null) {
+            throw new ProjectNotFoundException(new StringBuilder().append("Project ").append(projectId).append(" not found").toString());
+        }
+
+        if (updatedTask == null) {
+            throw new ProjectNotFoundException("The updated task is null");
+        }
+
+        return projectTaskRepository.save(updatedTask);
+    }
+
+    public void deleteBySequence(String projectId, String backlogId) {
+        ProjectTask projectTask = findProjectTaskBySequence(projectId, backlogId);
+        if (projectTask == null) {
+            throw new ProjectNotFoundException(new StringBuilder().append("Project ").append(projectId).append(" not found").toString());
+        }
+
+        projectTaskRepository.delete(projectTask);
     }
 }
